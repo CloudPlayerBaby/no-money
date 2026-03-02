@@ -1,10 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>登录</title>
 </head>
 <body>
-$END$
+<h2>用户登录</h2>
+<div>
+    <div>
+        <label>用户名：</label>
+        <input type="text" id="username">
+    </div>
+
+    <div>
+        <label>密码：</label>
+        <input type="password" id="password">
+    </div>
+
+    <div>
+        <button onclick="login()">登录</button>
+
+        <button type="reset"
+                onclick="document.getElementById('username').value=''; document.getElementById('password').value='';">重置
+        </button>
+    </div>
+</div>
+<!-- 注册跳转 -->
+<div>没有账号？<a href="register.html">立即注册</a></div>
+<!-- 显示登录信息（包括拦截提示和登录结果） -->
+<div id="message" style="color:red;"></div>
+
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    //登陆时检查拦截信息
+    onload = function() {
+        const msg = new URLSearchParams(location.search).get('msg');
+        if (msg === 'notlogin') {
+            document.getElementById('message').innerText = '您尚未登录，请先登录';
+            const url = new URL(location);
+            url.searchParams.delete('msg');
+            history.replaceState({}, '', url);
+        }
+    }
+
+    function login() {
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value.trim();
+
+        let messageDiv = document.getElementById("message");
+
+        if (!username) {
+            messageDiv.innerText = "用户名不能为空";
+            return;
+        }else {
+            messageDiv.innerText = '';
+        }
+
+        if (!password) {
+            messageDiv.innerText = "密码不能为空";
+            return;
+        }else {
+            messageDiv.innerText = '';
+        }
+
+        axios.post('/no-money/user/loginServlet',{
+            username:username,
+            password:password
+        }).then(resp => {
+            if (resp.data === 'success') {
+                messageDiv.style.color='green';
+                messageDiv.innerText = "登陆成功，即将跳转";
+                setTimeout(function (){
+                    location.href = "index.html";
+                },1500)
+            }else if(resp.data === 'failed'){
+                messageDiv.innerText = "登陆失败，请检查用户名或密码是否正确";
+            }else {
+                messageDiv.innerText = "系统错误，请稍后再试";
+            }
+        })
+    }
+
+</script>
 </body>
 </html>

@@ -2,12 +2,12 @@ package com.yuriyuri.util;
 
 import java.util.Random;
 
-public final class CodeUtil {
-    private CodeUtil(){
+public final class CaptchaUtil {
+    private CaptchaUtil(){
         throw new AssertionError("no");
     }
 
-    public static String createCode(int digit){
+    public static String createCaptcha(int digit){
         Random rand = new Random();
 
         StringBuffer base = new StringBuffer();

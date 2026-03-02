@@ -1,10 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>退出登录</title>
 </head>
 <body>
-$END$
+正在退出登录...
+
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    function jumpToLogin() {
+        axios.get("/no-money/bank/exitServlet")
+            .then(resp => {
+                if(resp.data==='success'){
+                    location.href='login.html';
+                } else {
+                    location.href='index.html';
+                }
+            })
+    }
+
+    setTimeout(jumpToLogin, 1500);
+
+</script>
 </body>
 </html>

@@ -1,10 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>注册</title>
 </head>
 <body>
-$END$
+<h2>用户注册</h2>
+<div>
+    <div>
+        <label>用户名：</label>
+        <input type="text" id="username" onblur="check()">
+    </div>
+
+    <div>
+        <label>密码：</label>
+        <input type="password" id="password" onblur="check()">
+    </div>
+
+    <div>
+        <label>验证码：</label>
+        <input type="text" id="captcha" onblur="check()">
+        <span id="captchaDisplay"></span>
+        <!--超链接，但是不跳转，只做交互-->
+        <a href="#" onclick="refreshCaptcha()">刷新</a>
+
+    </div>
+
+    <div>
+        <label>我是老大（输入正确的暗号验证）：</label>
+        <input type="text" id="identity" onblur="check()">
+    </div>
+
+    <div>
+        <button onclick="register()">注册</button>
+
+        <button type="reset"
+                onclick="document.getElementById('username').value='';
+                document.getElementById('password').value='';
+                document.getElementById('captcha').value='';">重置
+        </button>
+    </div>
+</div>
+<!-- 登录跳转 -->
+<div>已有账号？<a href="login.html">前往登录</a></div>
+<!-- 显示注册信息（包括拦截提示和注册结果） -->
+<div id="message" style="color:red;"></div>
+
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    function refreshCaptcha() {
+        axios.get('http://localhost:8080/no-money/user/captchaServlet?t=' + new Date().getTime())
+            .then(resp => {
+                document.getElementById("captchaDisplay").innerText = resp.data;
+            }).catch(error => {
+            console.log("获取验证码失败:", error);
+            document.getElementById("message").innerText = "验证码加载失败";
+        })
+    }
+
+    //第一次加载的时候就展示验证码
+    onload = function () {
+        refreshCaptcha();
+    }
+
+    function check() {
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value.trim();
+        let captcha = document.getElementById("captcha").value.trim();
+        let identity = document.getElementById("identity").value.trim();
+
+        let messageDiv = document.getElementById("message");
+
+        if (!username) {
+            messageDiv.innerText = "用户名不能为空";
+            return;
+        }else {
+            messageDiv.innerText = "";
+        }
+
+        if (!password) {
+            messageDiv.innerText = "密码不能为空";
+            return;
+        }else {
+            messageDiv.innerText = "";
+        }
+
+        //正则表达式
+        // 校验用户名
+        let usernameRegex = /^[a-zA-Z0-9]{4,16}$/;
+        if (!usernameRegex.test(username)) {
+            messageDiv.innerText = "用户名应由4-16位英文+数字组成";
+            return;
+        }else {
+            messageDiv.innerText = "";
+        }
+
+        // 校验密码
+        let passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+        if (!passwordRegex.test(password)) {
+            messageDiv.innerText = "密码应由8-20位英文+数字组成";
+            return;
+        }else {
+            messageDiv.innerText = "";
+        }
+
+        if (!captcha) {
+            messageDiv.innerText = "验证码不能为空";
+            return;
+        }else {
+            messageDiv.innerText = "";
+        }
+
+        //在验证身份填写栏中如果填写了内容
+        if (identity) {
+            if (identity != 233) {
+                messageDiv.innerText = "你不是老大！请不要填写此项！"
+                return;
+            }else {
+                messageDiv.innerText = "";
+            }
+        }else {
+            messageDiv.innerText = "";
+        }
+
+    }
+
+    function register() {
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value.trim();
+        let captcha = document.getElementById("captcha").value.trim();
+        let identity = document.getElementById("identity").value.trim();
+
+        let messageDiv = document.getElementById("message");
+
+        check();
+
+        axios.post('/no-money/user/registerServlet', {
+            username: username,
+            password: password,
+            captcha: captcha,
+            identity: identity
+        }).then(resp => {
+            if (resp.data === 'noCaptcha') {
+                messageDiv.innerText = "验证码不能为空";
+            } else if (resp.data === 'captchaFalse') {
+                messageDiv.innerText = "验证码错误";
+            } else if (resp.data === 'success') {
+                messageDiv.style.color = 'green';
+                messageDiv.innerText = "注册成功，即将跳转到登陆界面";
+                setTimeout(function () {
+                    location.href = 'login.html';
+                }, 1500)
+            } else if (resp.data === 'failed') {
+                messageDiv.innerText = "该用户名太受欢迎，请重试";
+            } else {
+                messageDiv.innerText = "系统错误";
+            }
+        })
+    }
+
+</script>
 </body>
 </html>

@@ -1,10 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>首页</title>
 </head>
 <body>
-$END$
+<h1>QG神笔小金库</h1>
+<!-- 显示欢迎信息 -->
+<div id="welcomeMessage"></div>
+<div>
+    <a href="deposit.html">1.存款（上交保护费预备）</a><br>
+    <a href="withdraw.html">2.取款（卷钱跑路）</a><br>
+    <a href="transfer.html">3.转账（上交保护费）</a><br>
+    <a href="inspect.html">4.查看交易流水</a><br>
+    <a href="modify.html">5.更改信息</a><br>
+<!--<a href="manageRegular.html">6.定期理财</a><br>-->
+<!--<a href="manageDemand.html">7.活期理财</a>-->
+</div>
+
+<div>
+    <a href="inspectAll.html" id="inspectAll" style="display: none">查看所有的流水</a>
+</div>
+
+<div>
+    <a href="checkAll.html" id="checkAll" style="display: none">查看所有人的信息</a>
+</div>
+
+<div>
+    <a href="exit.html">退出登录</a>
+</div>
+
+<script>
+    // 页面加载时读取 Cookie 中的用户名并显示
+    onload = function() {
+        var username = getCookie('username');
+        var balance = getCookie('balance')
+
+        var welcomeDiv = document.getElementById('welcomeMessage');
+        if (username) {
+            welcomeDiv.innerHTML = '当前用户：' + username + '，余额：'+balance;
+        } else {
+            welcomeDiv.innerHTML = '您尚未登录，请先<a href="login.html">登录</a>。';
+        }
+
+        let identity = getCookie("identity");
+        if(identity==='boss'){
+            document.getElementById("inspectAll").style.display='inline'
+            document.getElementById("inspectAll").innerText='查看所有的流水'
+
+            document.getElementById("checkAll").style.display='inline'
+            document.getElementById("checkAll").innerText='查看所有人的信息'
+        }
+
+    };
+
+    // 读取指定名称的 Cookie（与 login.html 中的函数一致）
+    function getCookie(name){
+        let cookies = document.cookie;
+        //通过; （分号+空格）分割cookie
+        let cookieArr = cookies.split('; ');
+
+        //遍历数组寻找目标cookie
+        for(let cookie of cookieArr){
+            //数组解构赋值，利用等号分割name和value
+            let [cookieName,cookieValue] = cookie.split("=");
+            //如果找到了对应的cookie，直接返回cookie的值
+            if(cookieName===name){
+                return cookieValue;
+            }
+        }
+        //遍历完毕还没找到，则返回null
+        return null;
+    }
+</script>
 </body>
 </html>

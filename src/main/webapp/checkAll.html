@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看所有人的信息</title>
+</head>
+<body>
+<h2>查看所有人的信息</h2>
+<div id="information"></div>
+
+<a href="index.html">回到主页</a>
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    axios.get("/no-money/user/checkAllServlet")
+        .then(resp=>{
+            const container = document.getElementById("information");
+            let data = resp.data;
+            let html = '<ul>';
+            data.forEach(user=>{
+                let identity = user.identity == 'small'?'小弟':'老大';
+                let line = `姓名：${user.username} 余额：${user.balance} 身份：${identity}`;
+                html+=`<li>${line}</li>`
+            })
+            html += '<ul>';
+            container.innerHTML=html;
+        })
+</script>
+</body>
+</html>

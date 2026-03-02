@@ -1,18 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>存款</title>
+    <title>取款</title>
 </head>
+
 <body>
-<h1></h1>
+<h1>取款</h1>
+
 <div>
-    <!---->
+    <label>金额：</label>
+    <input type="number" id="amount">
 </div>
 
 <div>
-    <a href="index.html">存款完毕？点击返回主页</a>
+    <button onclick="withdraw()">确认取款</button>
 </div>
 
+<div id="message" style="color:red;"></div>
+
+<div>
+    <a href="index.html">返回主页</a>
+</div>
+
+<!--引入axios-->
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    function withdraw() {
+        let amount = document.getElementById("amount").value.trim();
+        let messageDiv = document.getElementById("message");
+
+        //如果金额为空
+        if (!amount) {
+            //弹出提示信息
+            messageDiv.innerText = "请输入金额";
+            return;
+        }else {
+            messageDiv.innerText = '';
+        }
+
+        //先转为浮点数，再判断
+        if(parseFloat(amount)<=0){
+            messageDiv.innerText = "金额必须大于0";
+            return;
+        }else {
+            messageDiv.innerText = '';
+        }
+
+        //要把表单提交到/withdrawServlet
+        axios({
+            method: "post",
+            url: "http://localhost:8080/no-money/bank/withdrawServlet",
+            data: "amount=" + amount
+        }).then(resp => {
+            let msg = messageDiv;
+            if(resp.data==='success'){
+                msg.style.color='green';
+                msg.innerText='取款成功';
+                document.getElementById('amount').value='';//清空输入框
+            }else if(resp.data==='failed'){
+                msg.style.color='red';
+                msg.innerText='系统错误';
+            }else if(resp.data==='amount_err'){
+                msg.style.color='red';
+                msg.innerText='余额不足，请检查余额后重试';
+            }else {
+                msg.style.color='red';
+                msg.innerText='未知错误';
+            }
+        })
+    }
+
+</script>
 </body>
 </html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看信息</title>
+</head>
+<body>
+<h2>用户信息</h2>
+
+<div>
+    <label>用户名：</label>
+    <input type="text" id="username">
+</div>
+
+<div>
+    <label>密码：</label>
+    <input type="text" id="password">
+</div>
+
+<div>
+    <label>余额（不可更改）：</label>
+    <span id="balance"></span>
+</div>
+
+<div>
+    <button onclick="modify()">修改</button>
+</div>
+
+<div id="message" style="color:red"></div>
+
+<a href="index.html">返回主页</a>
+
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    //第一次进来显示信息，从cookie中获取
+    onload = function () {
+        //这里是input输入框，要用value获取，而不是innerText
+        document.getElementById("username").value = getCookie('username')
+        document.getElementById("password").value = getCookie('password')
+        document.getElementById("balance").innerText = getCookie('balance')
+    }
+
+    function getCookie(name) {
+        let cookies = document.cookie;
+        let cookieArr = cookies.split('; ');
+
+        for (let cookie of cookieArr) {
+            let [cookieName, cookieValue] = cookie.split('=');
+            if (cookieName === name) {
+                return cookieValue;
+            }
+        }
+        return null;
+    }
+
+    function modify() {
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value.trim();
+
+        let messageDiv = document.getElementById("message");
+
+        if (!username) {
+            messageDiv.innerText = "用户名不能为空";
+            return;
+        }else {
+            messageDiv.innerText = '';
+        }
+
+        if (!password) {
+            messageDiv.innerText = "密码不能为空";
+            return;
+        }else {
+            messageDiv.innerText = '';
+        }
+
+        //正则表达式
+        // 校验用户名
+        let usernameRegex = /^[a-zA-Z0-9]{4,16}$/;
+        if (!usernameRegex.test(username)) {
+            messageDiv.innerText = "用户名应由4-16位英文+数字组成";
+            return;
+        }else {
+            messageDiv.innerText = '';
+        }
+
+        // 校验密码
+        let passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+        if (!passwordRegex.test(password)) {
+            messageDiv.innerText = "密码应由8-20位英文+数字组成";
+            return;
+        }else {
+            messageDiv.innerText = '';
+        }
+
+        //校验完毕后，发送请求到/user/modifyServlet
+        axios.post('/no-money/user/modifyServlet', {
+            username: username,
+            password: password
+        }).then(resp => {
+            if (resp.data === 'success') {
+                messageDiv.style.color = 'green';
+                messageDiv.innerText = "修改成功，即将返回主页";
+                setTimeout(function (){location.href='index.html'},1500)
+            } else if (resp.data === 'exist') {
+                messageDiv.innerText = '该用户名已被占用！请重试'
+            } else if (resp.data === 'failed') {
+                messageDiv.innerText = '未知错误';
+            } else {
+                messageDiv.innerText = "系统错误";
+            }
+        });
+    }
+</script>
+</body>
+</html>

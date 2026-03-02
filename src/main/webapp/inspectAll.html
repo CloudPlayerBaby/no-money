@@ -2,16 +2,16 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>查看流水</title>
+    <title>查看所有的流水</title>
 </head>
 <body>
-<h3>我的交易流水</h3>
+<h3>所有的交易流水</h3>
 <div id="records"></div>
 
 <script src="js/axios-0.18.0.js"></script>
 
 <script>
-    axios.get('/no-money/bank/inspectServlet')
+    axios.get('/no-money/bank/inspectAllServlet')
         .then(resp=>{
             const container = document.getElementById("records");
             let data = resp.data;
@@ -30,9 +30,9 @@
                 let amount = parseFloat(item.amount).toFixed(2);
                 let balance = parseFloat(item.balanceAfter).toFixed(2);
 
-                //开始拼一行的内容：[时间] 类型  金额
+                //开始拼一行的内容：[时间] 用户 类型  金额
                 // let line = "["+item.time+"] " + item.type + "  " + sign + item.amount + "元  ";
-                let line = `[${item.time}] ${item.type} ${sign}${amount}元 `
+                let line = `[${item.time}] ${item.username} ${item.type} ${sign}${amount}元 `
 
                 //如果是转账，加上对方的信息
                 //[时间] 类型  金额  对方：xx
@@ -47,7 +47,7 @@
             });
             html += '</ul>';
             container.innerHTML = html;
-    })
+        })
 </script>
 <br>
 <a href="index.html">返回主页</a>
